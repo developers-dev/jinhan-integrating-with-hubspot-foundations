@@ -1,0 +1,27 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    title= title
+    link(rel='stylesheet' href='/css/style.css')
+  body
+    main.container.narrow
+      header.page-header
+        p.eyebrow HubSpot API practicum
+        h1 Add a campaign brief
+        p Enter values for the three campaign brief properties.
+      if error
+        section.notice.error(role='alert')
+          h2 The record was not saved
+          p= error
+      form.card(method='post' action='/update-cobj')
+        label(for='campaign_name') Campaign name
+        input#campaign_name(type='text' name='campaign_name' required maxlength='100' value=form.campaign_name || '')
+        label(for='channel') Channel
+        input#channel(type='text' name='channel' required maxlength='100' value=form.channel || '')
+        label(for='status') Status
+        input#status(type='text' name='status' required maxlength='100' value=form.status || '')
+        button.button(type='submit') Save campaign brief
+      p.return-link
+        a(href='/') Return to the homepage

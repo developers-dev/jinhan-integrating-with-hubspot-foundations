@@ -1,0 +1,37 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    title= title
+    link(rel='stylesheet' href='/css/style.css')
+  body
+    main.container
+      header.page-header
+        p.eyebrow HubSpot API practicum
+        h1 Campaign briefs
+        p View the campaign brief records stored in your HubSpot developer test account.
+        a.button(href='/update-cobj') Add to this table
+      if error
+        section.notice(role='alert')
+          h2 The records could not be loaded
+          p= error
+      else if records.length === 0
+        section.notice
+          h2 No campaign briefs yet
+          p Create a record with the form to see it listed here.
+      else
+        .table-wrap
+          table
+            caption Campaign brief records
+            thead
+              tr
+                th(scope='col') Campaign name
+                th(scope='col') Channel
+                th(scope='col') Status
+            tbody
+              each record in records
+                tr
+                  td= record.properties.campaign_name || '—'
+                  td= record.properties.channel || '—'
+                  td= record.properties.status || '—'
