@@ -8,7 +8,7 @@ const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const API_BASE_URL = 'https://api.hubapi.com';
 const OBJECT_TYPE = process.env.HUBSPOT_CUSTOM_OBJECT_TYPE;
-const PRIVATE_APP_ACCESS_TOKEN = process.env.HUBSPOT_PRIVATE_APP_ACCESS_TOKEN;
+const HUBSPOT_ACCESS_TOKEN = process.env.HUBSPOT_ACCESS_TOKEN;
 const OBJECT_PROPERTIES = ['campaign_name', 'channel', 'status'];
 const CONTACT_PROPERTY = 'contact_email';
 
@@ -18,8 +18,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 function configurationError() {
-  if (!PRIVATE_APP_ACCESS_TOKEN || !OBJECT_TYPE) {
-    return 'Set HUBSPOT_PRIVATE_APP_ACCESS_TOKEN and HUBSPOT_CUSTOM_OBJECT_TYPE in your local .env file.';
+  if (!HUBSPOT_ACCESS_TOKEN || !OBJECT_TYPE) {
+    return 'Set HUBSPOT_ACCESS_TOKEN and HUBSPOT_CUSTOM_OBJECT_TYPE in your local .env file.';
   }
   return null;
 }
@@ -42,7 +42,7 @@ function hubspotErrorMessage(error) {
 function requestConfig() {
   return {
     headers: {
-      Authorization: `Bearer ${PRIVATE_APP_ACCESS_TOKEN}`,
+      Authorization: `Bearer ${HUBSPOT_ACCESS_TOKEN}`,
       'Content-Type': 'application/json',
     },
   };
