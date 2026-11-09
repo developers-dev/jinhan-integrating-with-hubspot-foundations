@@ -51,5 +51,5 @@ The form requires an existing contact email; after creating a campaign brief, th
 - [x] Create at least three custom object records and associate them with contact records.
 - [x] Add the test account's custom object list link above.
 - [x] Run the app locally and verify listing and record creation.
-- [ ] Merge `working-branch` into `main` on GitHub.
-- [ ] Submit the public fork URL through the HubSpot Academy practical exercise. Do not use the upload option.
+- [x] Merge `working-branch` into `main` on GitHub (PR #1).
+- [x] Submit the public fork URL through the HubSpot Academy practical exercise. Do not use the upload option. Grading is pending.
