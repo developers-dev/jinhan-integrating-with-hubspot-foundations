@@ -35,12 +35,13 @@ Do not commit a private app token. The local `.env` file is ignored by Git.
 4. Run `node index.js` and open `http://localhost:3000`.
 
 The homepage lists the custom object records. Select **Add to this table** to create another record.
+The form requires an existing contact email; after creating a campaign brief, the app associates that record with the matching contact.
 
 ## Routes and templates
 
 - `GET /`: retrieves custom object records and renders `views/homepage.pug`.
 - `GET /update-cobj`: renders the record form in `views/updates.pug`.
-- `POST /update-cobj`: creates a custom object record and redirects to `/`.
+- `POST /update-cobj`: finds the contact by email, creates a custom object record, associates it with the contact, and redirects to `/`.
 
 ## Practicum checklist
 

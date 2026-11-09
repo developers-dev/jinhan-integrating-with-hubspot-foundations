@@ -10,6 +10,7 @@ const API_BASE_URL = 'https://api.hubapi.com';
 const OBJECT_TYPE = process.env.HUBSPOT_CUSTOM_OBJECT_TYPE;
 const PRIVATE_APP_ACCESS_TOKEN = process.env.HUBSPOT_PRIVATE_APP_ACCESS_TOKEN;
 const OBJECT_PROPERTIES = ['campaign_name', 'channel', 'status'];
+const CONTACT_PROPERTY = 'contact_email';
 
 app.set('view engine', 'pug');
 app.use(express.static(path.join(__dirname, 'public')));
@@ -62,7 +63,7 @@ app.get('/', async (req, res) => {
       `${API_BASE_URL}/crm/v3/objects/${encodeURIComponent(OBJECT_TYPE)}`,
       {
         ...requestConfig(),
-        params: { properties: OBJECT_PROPERTIES.join(','), limit: 100 },
+        params: { properties: OBJECT_PROPERTIES.join(','), associations: 'contacts', limit: 100 },
       },
     );
 
@@ -102,20 +103,54 @@ app.post('/update-cobj', async (req, res) => {
   const properties = Object.fromEntries(
     OBJECT_PROPERTIES.map((property) => [property, String(req.body[property] || '').trim()]),
   );
-  if (Object.values(properties).some((value) => value.length === 0)) {
+  const contactEmail = String(req.body[CONTACT_PROPERTY] || '').trim();
+  if (Object.values(properties).some((value) => value.length === 0) || !contactEmail) {
     return res.status(400).render('updates', {
       title: 'Update Custom Object Form | Integrating With HubSpot I Practicum',
-      error: 'Complete all three fields before submitting.',
+      error: 'Complete all three campaign fields and enter the email address of an existing contact.',
       form: req.body,
     });
   }
 
   try {
-    await axios.post(
+    const contactResponse = await axios.post(
+      `${API_BASE_URL}/crm/v3/objects/contacts/search`,
+      {
+        filterGroups: [{ filters: [{ propertyName: 'email', operator: 'EQ', value: contactEmail }] }],
+        properties: ['email'],
+        limit: 1,
+      },
+      requestConfig(),
+    );
+    const contact = contactResponse.data.results?.[0];
+    if (!contact) {
+      return res.status(404).render('updates', {
+        title: 'Update Custom Object Form | Integrating With HubSpot I Practicum',
+        error: 'No contact with that email address exists in the developer test account. Check the email and try again.',
+        form: req.body,
+      });
+    }
+
+    const createResponse = await axios.post(
       `${API_BASE_URL}/crm/v3/objects/${encodeURIComponent(OBJECT_TYPE)}`,
       { properties },
       requestConfig(),
     );
+    const recordId = createResponse.data.id;
+    try {
+      await axios.put(
+        `${API_BASE_URL}/crm/v4/objects/${encodeURIComponent(OBJECT_TYPE)}/${encodeURIComponent(recordId)}/associations/default/contacts/${encodeURIComponent(contact.id)}`,
+        undefined,
+        requestConfig(),
+      );
+    } catch (associationError) {
+      console.error('HubSpot custom object association failed:', associationError.response?.status || associationError.message);
+      return res.status(502).render('updates', {
+        title: 'Update Custom Object Form | Integrating With HubSpot I Practicum',
+        error: `The campaign brief was created (record ID ${recordId}), but the contact association failed. Check the app scopes before retrying.`,
+        form: req.body,
+      });
+    }
     return res.redirect('/');
   } catch (error) {
     console.error('HubSpot custom object create request failed:', error.response?.status || error.message);

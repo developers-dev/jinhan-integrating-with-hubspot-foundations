@@ -16,6 +16,8 @@ html(lang='en')
           h2 The record was not saved
           p= error
       form.card(method='post' action='/update-cobj')
+        label(for='contact_email') Existing HubSpot contact email
+        input#contact_email(type='email' name='contact_email' required value=form.contact_email || '')
         label(for='campaign_name') Campaign name
         input#campaign_name(type='text' name='campaign_name' required maxlength='100' value=form.campaign_name || '')
         label(for='channel') Channel

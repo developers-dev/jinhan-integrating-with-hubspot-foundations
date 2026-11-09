@@ -29,9 +29,11 @@ html(lang='en')
                 th(scope='col') Campaign name
                 th(scope='col') Channel
                 th(scope='col') Status
+                th(scope='col') Associated contacts
             tbody
               each record in records
                 tr
                   td= record.properties.campaign_name || '—'
                   td= record.properties.channel || '—'
                   td= record.properties.status || '—'
+                  td= record.associations && record.associations.contacts ? record.associations.contacts.results.length : 0
